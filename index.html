@@ -1,0 +1,140 @@
+
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>overtime record</title>
+    <link rel="stylesheet" href="overtimeSearch.css">
+    <script src="jquery.min.js"></script>
+    <script>
+      
+        $.ajax({
+        type: 'POST',
+        url: 'ajax.php',
+        data:{},
+        success: function (data) {
+          var arr = JSON.parse(data);
+        //  console.log(arr.length);
+          var totalTimes = 0;
+          var leaveTimes = 0;
+         for(let i = 0; i<arr.length;i++){
+          insertTable(arr[i]);
+          var everyTime = parseInt(arr[i][2]);
+          if(everyTime > 0){
+            totalTimes += everyTime;
+          }else{
+            leaveTimes += (-everyTime);
+          }
+         }
+
+         var allleaveTimes = totalTimes - leaveTimes;
+         var spa1 = document.querySelector('.total');
+         spa1.innerHTML = totalTimes +"分钟" + "("+ Math.floor(totalTimes/60) +"小时" + totalTimes%60 + "分钟)" ;
+         var spa2 = document.querySelector('.leave');
+         spa2.innerHTML = leaveTimes +"分钟" + "("+ Math.floor(leaveTimes/60) +"小时" + leaveTimes%60 + "分钟)" ;
+         var spa2 = document.querySelector('.allleave');
+         spa2.innerHTML = allleaveTimes +"分钟" + "("+ Math.floor(allleaveTimes/60) +"小时" + allleaveTimes%60 + "分钟)" ;
+       }
+        });
+
+        function insertTable(arr){
+          // var tbs = document.querySelector('#tbs');
+        // for(let i =0;i< arr.length; i++){
+        //   var ths = document.createElement("td");
+        //   tbs.appendChild(ths);
+        //   ths.innerHTML = arr[i];
+        // }
+        var cntr = document.querySelector('#DataTable');
+        objTR = cntr.insertRow(-1);
+        var n = 0;
+        var objCell = objTR.insertCell(n++); //插入td
+		    objCell.innerHTML = arr[n-1];
+		    var objCell = objTR.insertCell(n++);
+		    objCell.innerHTML = arr[n-1];
+        var objCell = objTR.insertCell(n++);
+		    objCell.innerHTML = arr[n-1];
+        var objCell = objTR.insertCell(n++);
+		    objCell.innerHTML = arr[n-1];
+        }
+
+        function reloads(){
+          location.reload();
+        }
+
+    //----------------2
+    //   function showHint()
+    // {
+    //     var xmlhttp=new XMLHttpRequest();
+    //      xmlhttp.onreadystatechange = function(){
+    //        if (xmlhttp.readyState==4 && xmlhttp.status==200)
+    //       {
+    //         document.getElementById("cs").innerHTML=xmlhttp.responseText;
+    //       }
+    //   }
+    //     xmlhttp.open("POST","ajax.php");
+    //     xmlhttp.send();
+    // }
+    // showHint();
+    
+      </script>
+  </head>
+  
+  <body>
+    <div
+      style="
+        background-color: rgb(158, 235, 235);
+        height: 88px;
+        font-size: 24px;
+      "
+    >2022年喽!</div>
+    <div class="middle">
+      <div class="left" style="flex:2 ;">
+        <form action="data.php" method="get" id="queryForm" target="frameName">
+          <!-- target="frameName" -->
+          <input type="date" id="datetimes" value="" name="datetimes">日期&nbsp;&nbsp;
+          <input type="number" id="duration" value="" name="duration" >时长
+          <input type="submit" onclick="reloads()">
+        </form>
+        <iframe src="" frameborder="0" name="frameName" style="display: none;"></iframe>
+      </div>
+     <div class="right" style="flex:5 ;">
+      <img src="images/加班审批.png" alt=""> 总计加班时间:<span class="total" style="color: green;"></span>
+      <img src="images/请假统计-01.png" alt="">总计请假时间:<span class="leave" style="color: rgb(238, 64, 64);"></span>
+      <img src="images/时间.png" alt="">总计时间:<span class="allleave" style="color: rgb(4, 127, 241);"></span>
+     </div>
+    </div>
+   
+
+    <div class="content" style="display:;">
+    <div id="divHeader" >
+     <table id="tbs" style="width: 100%;">
+         <tr>
+           <th style="width: 10%;">序号</th>
+           <th style="width: 30%;">日期</th>
+           <th style="width: 30%;">时长</th>
+           <th style="width: 10%;">时间戳</th>
+         </tr>
+        </table>
+    </div>
+ 
+    <div id="divContent">
+      <table id='DataTable' style="width: 100%;" >
+        <tbody>
+          <tr>
+            <td style="width: 10%;"></td>
+            <td style="width: 30%;"></td>
+            <td style="width: 30%;"></td>
+            <td style="width: 10%;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+     
+    </div>
+  </body>
+  
+ 
+</html>

@@ -1,0 +1,39 @@
+
+    div {
+      flex: 30%;
+      flex-wrap: wrap;
+      text-align: center;
+      border: 1px solid rgb(116, 107, 107);
+    }
+    .content {
+      background-color: #ccc;
+      height: 100%;
+    }
+    button {
+      border: 1px solid #b4572b;
+      margin: 18px;
+      border-radius: 5px;
+      transform: scale(1.5);
+    }
+    li {
+      /* float: left; */
+      height: 20px;
+      color: #b4572b;
+    }
+    table{
+      text-align: center;
+      border-collapse: collapse; 
+      margin: 8px;
+    }
+    .middle{
+      display: flex;
+    }
+    img{
+      width: 20px;
+      height: 20px;
+      vertical-align:middle ;
+      margin-left: 32px;
+    }
+    
+    
+
