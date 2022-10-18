@@ -11,9 +11,8 @@
     }
     button {
       border: 1px solid #b4572b;
-      margin: 18px;
       border-radius: 5px;
-      transform: scale(1.5);
+      transform: scale(.9);
     }
     li {
       /* float: left; */
@@ -34,6 +33,19 @@
       vertical-align:middle ;
       margin-left: 32px;
     }
-    
+    #alertEdit{
+      width: 300px;
+      height: 130px;
+      background-color: #b4572b;
+      opacity: .9;
+      position: absolute;
+      left: 40%;
+      top: 40%;
+      border: 10px solid rgb(63, 55, 55);
+      border-radius: 8px;
+    }
+    input{
+      border-radius: 5px;
+    }
     
 

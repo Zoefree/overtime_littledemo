@@ -10,26 +10,29 @@
     <link rel="stylesheet" href="overtimeSearch.css">
     <script src="jquery.min.js"></script>
     <script>
-      
         $.ajax({
         type: 'POST',
         url: 'ajax.php',
         data:{},
         success: function (data) {
           var arr = JSON.parse(data);
-        //  console.log(arr.length);
+          //  console.log(arr.length);
           var totalTimes = 0;
           var leaveTimes = 0;
          for(let i = 0; i<arr.length;i++){
           insertTable(arr[i]);
-          var everyTime = parseInt(arr[i][2]);
+          var edit = document.querySelectorAll("#edit");
+          edit[i].value = arr[i][0];
+          var deletes = document.querySelectorAll("#delete");
+          deletes[i].value = arr[i][0];
+          // console.log(deletes[i].value);//Nodelist
+          var everyTime = parseInt(arr[i][3]);
           if(everyTime > 0){
             totalTimes += everyTime;
           }else{
             leaveTimes += (-everyTime);
           }
          }
-
          var allleaveTimes = totalTimes - leaveTimes;
          var spa1 = document.querySelector('.total');
          spa1.innerHTML = totalTimes +"分钟" + "("+ Math.floor(totalTimes/60) +"小时" + totalTimes%60 + "分钟)" ;
@@ -39,6 +42,7 @@
          spa2.innerHTML = allleaveTimes +"分钟" + "("+ Math.floor(allleaveTimes/60) +"小时" + allleaveTimes%60 + "分钟)" ;
        }
         });
+        
 
         function insertTable(arr){
           // var tbs = document.querySelector('#tbs');
@@ -58,27 +62,210 @@
 		    objCell.innerHTML = arr[n-1];
         var objCell = objTR.insertCell(n++);
 		    objCell.innerHTML = arr[n-1];
+        var objCell = objTR.insertCell(n++);
+		    objCell.innerHTML = arr[n-1];
+        var objCell = objTR.insertCell(n++);
+        objCell.innerHTML =
+         '<form  id= "form" action="data.php" method="get" style="display:flex;"><label><input type="text" value="" id="edit" name="edit" onclick="alterEditData(value)" style="display:none;"><img src="images/编辑.png"></img></label>' + 
+        '<label><input type="text" value="" id="delete" name="delete" onclick="deleteData(value)" style="display:none"><img src="images/删除.png"></img></label><input type="text" name="task" value="operate" style="display:none;" ></form>';
+        // target="frameName" 
+        
+        }
+      
+        function alterEditData(value){
+          var alertEdit = document.getElementById("alertEdit");
+          if(alertEdit.style.display = 'none'){
+            alertEdit.style.display = 'block';
+            var datetimesEdit = document.getElementById("datetimesEdit");
+            var deadlineEdit = document.getElementById("deadlineEdit");
+            var orders = document.getElementById("orders");//标识
+            var overtimeTextEdit = document.getElementById("overtimeTextEdit");//时长
+            
+            var trs = document.querySelectorAll("tr");
+            var trval = trs[parseInt(value)+1];
+            //  console.log(trval.children[1].innerHTML,trval.children[2].innerHTML);
+            datetimesEdit.value = trval.children[1].innerHTML;
+            deadlineEdit.value = trval.children[2].innerHTML;
+            orders.value = value;
+            overtimeTextEdit.value = trval.children[3].innerHTML;
+            var durationVals = parseInt(overtimeTextEdit.value);
+            // console.log(parseInt(overtimeTextEdit.value));//string
+            var dataTimeSpan = document.getElementById("dataTimeSpan");
+            var durationSpan = document.getElementById("durationSpan");
+            if( durationVals < 0){
+              // alert('ttt');  id=durationVals,id不能有空格
+              durationSpan.style.display = 'block';
+              dataTimeSpan.style.display = 'none';
+            }else{
+              durationSpan.style.display = 'none';
+              dataTimeSpan.style.display = 'block';
+            }
+         
+            }
+          }
+
+        function editData(){
+          alertEdit.style.display = 'none';
+         var datetimesEditFin = document.getElementById("datetimesEdit").value;
+         var deadlineEditFin = document.getElementById("deadlineEdit").value;
+         var ordersVal = document.getElementById("orders").value;
+         var overtimeTextEditFin = document.getElementById("overtimeTextEdit").value;
+         var durationValFin = parseInt(overtimeTextEditFin);
+        //  alert(ordersVal);
+         var h = parseInt(deadlineEditFin.substr(0,2)) -19;
+              if(h>=0){
+                var hm = 90 + (h * 60);
+              }
+              var m = parseInt(deadlineEditFin.substr(3,2));
+              var allm = hm + m;
+              // console.log("h",h,'m',m,'tm:',allm);
+
+         var xmlHttpEdit=new XMLHttpRequest();
+         try
+            {
+              if(durationValFin >= 0){
+                var url = "data.php?task=edit&datetimesEdit="+ datetimesEditFin + "&deadlineEdit=" + deadlineEditFin + "&durationVal=" + allm + "&edit=" + ordersVal;
+                var q = "task=edit&edit=" + ordersVal +"&datetimesEdit="+ datetimesEditFin + "&deadlineEdit=" +deadlineEditFin+ "&durationVal=" + allm;
+              }else{
+                var url = "data.php?task=edit&datetimesEdit="+ datetimesEditFin + "&durationVal=" + durationValFin + "&edit=" + ordersVal;
+                var q = "task=edit&edit=" + ordersVal +"&datetimesEdit="+ datetimesEditFin + "&durationVal=" + durationValFin;
+                    }
+                    
+                    
+	          	      xmlHttpEdit.open("post", url, true);
+	          	      //post这一句必须加上
+	          	      xmlHttpEdit.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');//jqurey中不需要加
+	          	      xmlHttpEdit.send(q);
+                  }
+            catch(e){alert(e);}
+            location.reload(true);
         }
 
-        function reloads(){
-          location.reload();
+        function quitData(){
+          alertEdit.style.display = 'none';
         }
 
-    //----------------2
-    //   function showHint()
-    // {
-    //     var xmlhttp=new XMLHttpRequest();
-    //      xmlhttp.onreadystatechange = function(){
-    //        if (xmlhttp.readyState==4 && xmlhttp.status==200)
-    //       {
-    //         document.getElementById("cs").innerHTML=xmlhttp.responseText;
-    //       }
-    //   }
-    //     xmlhttp.open("POST","ajax.php");
-    //     xmlhttp.send();
-    // }
-    // showHint();
-    
+        function deleteData(value){
+         var xmlHttpDelete = new XMLHttpRequest();
+          
+          try
+            {
+          var url = "data.php?task=deletes&delete="+value;
+          var q = "task=deletes&delete="+value;
+		      xmlHttpDelete.open("post", url, true);
+          // xmlHttpDelete.onreadystatechange=function(){
+            // if(xmlHttpDelete.readyState == 4)
+            // {
+            //   if(xmlHttpDelete.status == 200)
+            //   {
+          	// 		var s = xmlHttpDelete.responseText;
+            //     console.log(s);
+            //   }
+            //   }
+          // };
+		      //post这一句必须加上
+		      xmlHttpDelete.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');
+		      xmlHttpDelete.send(q);
+        }
+            catch(e){alert(e);}
+            location.reload(true);
+        }
+
+        function insertData(){
+          
+          var xmlHttpInsert = new XMLHttpRequest();
+           
+           try
+             {
+              var dateval = document.getElementById('datetimes').value;
+              var timeval = document.getElementById('deadline').value;
+              var overtimeText = document.getElementById("overtimeText").value;
+              if(overtimeText == '' && timeval !=''){
+                var h = parseInt(timeval.substr(0,2)) -19;
+                if(h>=0){
+                var hm = 90 + (h * 60);
+                        }
+                var m = parseInt(timeval.substr(3,2));
+                var allm = hm + m;
+                // console.log("h",h,'m',m,'tm:',allm);
+                var url = "data.php?task=inserts&datetimes="+ dateval +"&deadline="+ timeval +"&duration=" + allm ;
+                var q = "task=inserts&datetimes="+ dateval +"&deadline="+ timeval+"&duration=" + allm ;
+              }else if(overtimeText !=''&& timeval == ''){
+                var url = "data.php?task=inserts&datetimes="+ dateval +"&deadline="+ timeval +"&duration=" + (-parseInt(overtimeText)) ;
+                var q = "task=inserts&datetimes="+ dateval +"&deadline="+ timeval+"&duration=" + (-parseInt(overtimeText)) ;
+              }else{
+                alert('请填写"加班时间" 或者"请假时长"中的任一项，不能同时选择两项或全为空~')
+                return;
+              }
+              
+           xmlHttpInsert.open("post", url, true);
+           // xmlHttpDelete.onreadystatechange=function(){
+             // if(xmlHttpDelete.readyState == 4)
+             // {
+             //   if(xmlHttpDelete.status == 200)
+             //   {
+             // 		var s = xmlHttpDelete.responseText;
+             //     console.log(s);
+             //   }
+             //   }
+           // };
+           //post这一句必须加上
+           xmlHttpInsert.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');
+           xmlHttpInsert.send(q);
+           
+         }
+             catch(e){alert(e);}
+             location.reload(true);
+         }
+         
+         function haveColor(value){
+          if(value == '取消'){
+            var qipt = document.getElementById("quitipt");
+          qipt.style.backgroundColor = '#329a85';
+          }else{
+            var eipt = document.getElementById("editipt");
+          eipt.style.backgroundColor = '#4d4646';
+          }
+          
+         }
+         function noColor(value){
+          if(value == '取消'){
+            var qipt = document.getElementById("quitipt");
+          qipt.style.backgroundColor = '';
+          }else{
+            var eipt = document.getElementById("editipt");
+          eipt.style.backgroundColor = '';
+          }
+         }
+
+         function overTime(){
+          var overtimeText = document.getElementById("overtimeText");
+         }
+         function orderByDate(){
+          
+          var flag = 0;
+          var xmlHttpOrder=new XMLHttpRequest();
+          
+          if(flag == 0){
+            var url = "data.php?task=orderByDateUD";//由近及远
+            var q = "task=orderByDateUD";
+            xmlHttpOrder.open("post", url, true);
+	           //post这一句必须加上
+	           xmlHttpOrder.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');//jqurey中不需要加
+	           xmlHttpOrder.send(q);
+             location.reload(true);
+            flag = 1;
+          }else {
+            var url = "data.php?task=orderByDateUT";
+            var q = "task=orderByDateUT";
+             xmlHttpOrder.open("post", url, true);
+	           //post这一句必须加上
+	           xmlHttpOrder.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');//jqurey中不需要加
+	           xmlHttpOrder.send(q);
+             location.reload(true);
+             flag = 0;
+            } 
+          }
       </script>
   </head>
   
@@ -91,14 +278,28 @@
       "
     >2022年喽!</div>
     <div class="middle">
-      <div class="left" style="flex:2 ;">
-        <form action="data.php" method="get" id="queryForm" target="frameName">
+      <div class="left" style="flex:2 ; display: flex;">
+        <!-- <form action="data.php" method="get" id="queryForm" target="frameName"> -->
           <!-- target="frameName" -->
-          <input type="date" id="datetimes" value="" name="datetimes">日期&nbsp;&nbsp;
-          <input type="number" id="duration" value="" name="duration" >时长
-          <input type="submit" onclick="reloads()">
-        </form>
-        <iframe src="" frameborder="0" name="frameName" style="display: none;"></iframe>
+          <div style="flex:1;">
+            <p style="margin-top:0px">日期</p>
+            <input type="date" id="datetimes" value="" name="datetimes">
+          </div>
+          
+          <div style="flex:3;">
+            <span>加班时间</span><img src="images/加班审批.png" alt="">
+            <input type="time" id="deadline" value="" name="deadline" >
+            <input type="button" value="submit" onclick="insertData()"><br>
+          <!-- </div>
+          <div> -->
+            <span>请假时长</span><img src="images/请假统计-01.png" alt="">
+            <input type="number" id="overtimeText" placeholder="请输入分钟数" value="" name="deadline" style="width: 106px;margin: 8px;" >
+            <input type="button" value="submit" onclick="insertData()">
+          </div>
+          
+          
+        <!-- </form> -->
+        <!-- <iframe src="" frameborder="0" name="frameName" style="display: none;"></iframe> -->
       </div>
      <div class="right" style="flex:5 ;">
       <img src="images/加班审批.png" alt=""> 总计加班时间:<span class="total" style="color: green;"></span>
@@ -112,10 +313,12 @@
     <div id="divHeader" >
      <table id="tbs" style="width: 100%;">
          <tr>
-           <th style="width: 10%;">序号</th>
-           <th style="width: 30%;">日期</th>
-           <th style="width: 30%;">时长</th>
-           <th style="width: 10%;">时间戳</th>
+           <th style="width: 2%;"> 序号</th>
+           <th style="width: 20%;" onclick="orderByDate()">日期</th>
+           <th style="width: 20%;">截至时间</th>
+           <th style="width: 10%;">时长</th>
+           <th style="width: 15%;">时间戳</th>
+           <th style="width: 8%;"> 操作</th>
          </tr>
         </table>
     </div>
@@ -124,15 +327,28 @@
       <table id='DataTable' style="width: 100%;" >
         <tbody>
           <tr>
+            <td style="width: 2%;"></td>
+            <td style="width: 20%;"></td>
+            <td style="width: 20%;"></td>
             <td style="width: 10%;"></td>
-            <td style="width: 30%;"></td>
-            <td style="width: 30%;"></td>
-            <td style="width: 10%;"></td>
+            <td style="width: 15%;"></td>
+            <td style="width: 8%;"></td>
           </tr>
         </tbody>
       </table>
     </div>
      
+    </div>
+    <div id="alertEdit" style="display: none; height: 150px;">
+      <h1 style="font-size:16px; color:bisque;">编辑信息</h1>
+      <input type="text" id="orders" name="orders" style="display: none;">
+      <input type="date" id="datetimesEdit" value="" name="datetimes" >日期&nbsp;&nbsp;
+      <span id="dataTimeSpan"  style="display: block;"><input type="time" id="deadlineEdit" value="" name="deadline" >时间<br></span>
+      <span id="durationSpan"  style="display: none;"><input type="number" id="overtimeTextEdit" value="" name="deadline" placeholder="请输入分钟数"  style="width: 106px;margin: 8px;" >时长</span>
+      <input type="submit" id="editipt" onclick="editData()" value="提交修改" style="position:absolute; top:110px;left:22px"
+      onmouseover="haveColor(value)" onmouseleave="noColor(value)" >
+      <input type="submit" id="quitipt" onclick="quitData()" value="取消" style="position:absolute; top:110px;left:236px" 
+      onmouseover="haveColor(value)" onmouseleave="noColor(value)" >
     </div>
   </body>
   
